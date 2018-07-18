@@ -9,7 +9,7 @@
         this.Items = await http.GetJsonAsync<List<Models.Todo>>("/todo-items.json");
     }
 
-    public List<Models.Todo> Items { get; set; } = new List<Models.Todo>();
+    public List<Models.Todo> Items { get; set; }
 
     public bool IsCheckAll { get; set; }
 
