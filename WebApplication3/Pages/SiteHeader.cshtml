@@ -1,0 +1,11 @@
+﻿@functions {
+
+    [Parameter]
+    string SiteName { get; set; }
+
+    [Parameter]
+    Action<string> OnMyClick { get; set; }
+
+
+}
+<h1 onclick="@(() => OnMyClick?.Invoke("OK"))">@SiteName</h1>

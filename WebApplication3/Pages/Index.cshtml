@@ -1,7 +1,90 @@
 ﻿@page "/"
+@inject HttpClient http
+@functions { 
 
-<h1>Hello, world!</h1>
+    protected override async Task OnInitAsync()
+    {
+        await Task.Delay(1000);
 
-Welcome to your new app.
+        this.Items = await http.GetJsonAsync<List<Models.Todo>>("/todo-items.json");
+    }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    public List<Models.Todo> Items { get; set; } = new List<Models.Todo>();
+
+    public bool IsCheckAll { get; set; }
+
+    public void ToggleAll()
+    {
+        IsCheckAll = !IsCheckAll;
+        foreach (var item in Items)
+        {
+            item.IsCompleted = IsCheckAll;
+        }
+    }
+
+}
+
+<section class="todoapp">
+    <header class="header">
+        <SiteHeader SiteName="Todo 123" OnMyClick="@((msg) => Console.WriteLine("LOG: " + msg))" />
+        <input class="new-todo" onchange="@(evt => Items.Add(new Models.Todo() { Title = evt.Value.ToString() }))" placeholder="What needs to be done?" autofocus />
+    </header>
+    <!-- This section should be hidden by default and shown when there are todos -->
+    <section class="main">
+        <input id="toggle-all" class="toggle-all" type="checkbox" onclick="@(() => ToggleAll())" />
+        <label for="toggle-all">Mark all as complete</label>
+        <ul class="todo-list">
+            <!-- These are here just to show the structure of the list items -->
+            <!-- List items should get the class `editing` when editing and `completed` when marked as completed -->
+            @foreach (var item in Items)
+            {
+                <li class="@(item.IsCompleted ? "completed":"")">
+                    <div class="view">
+                        <input class="toggle" type="checkbox" onclick="@(() => item.IsCompleted = !item.IsCompleted)" checked="@item.IsCompleted" />
+                        <label>@item.Title</label>
+                        <button class="destroy" onclick="@(() => Items.Remove(item))"></button>
+                    </div>
+                    <input class="edit" value="Rule the web" />
+                </li>
+            }
+        </ul>
+    </section>
+    <!-- This footer should hidden by default and shown when there are todos -->
+    <footer class="footer">
+        <!-- This should be `0 items left` by default -->
+        <span class="todo-count">
+            <strong>0</strong> item left
+        </span>
+        <!-- Remove this if you don't implement routing -->
+        <ul class="filters">
+            <li>
+                <a class="selected" href="#/">All</a>
+            </li>
+            <li>
+                <a href="#/active">Active</a>
+            </li>
+            <li>
+                <a href="#/completed">Completed</a>
+            </li>
+        </ul>
+        <!-- Hidden if no completed items are left ↓ -->
+        <button class="clear-completed" onclick="@(() => Items.Clear())">Clear completed</button>
+    </footer>
+</section>
+<footer class="info">
+    <p>Double-click to edit a todo</p>
+    <!-- Remove the below line ↓ -->
+    <p>
+        Template by
+        <a href="http://sindresorhus.com">Sindre Sorhus</a>
+    </p>
+    <!-- Change this out with your name and url ↓ -->
+    <p>
+        Created by
+        <a href="http://todomvc.com">you</a>
+    </p>
+    <p>
+        Part of
+        <a href="http://todomvc.com">TodoMVC</a>
+    </p>
+</footer>
